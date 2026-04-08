@@ -1,0 +1,15 @@
+{
+  "name": "kv_query",
+  "version": "1.0.0",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "build": "node src/build_index.js",
+    "query": "node src/query.js",
+    "clean": "rm data/index.js"
+  },
+  "devDependencies": {
+    "esbuild": "^0.28.0",
+    "vite": "^8.0.16"
+  }
+}
