@@ -1,15 +1,16 @@
 {
-  "name": "kv_query",
+  "name": "kv_query_app",
   "version": "1.0.0",
   "type": "module",
   "private": true,
   "scripts": {
-    "build": "node src/build_index.js",
-    "query": "node src/query.js",
-    "clean": "rm data/index.js"
+    "dev": "vite",
+    "build": "node scripts/postbuild.js",
+    "preview": "vite preview"
   },
   "devDependencies": {
-    "esbuild": "^0.28.0",
+    "html-minifier-terser": "^7.2.0",
+    "terser": "^5.46.2",
     "vite": "^8.0.16"
   }
 }
