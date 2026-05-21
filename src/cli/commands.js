@@ -5,10 +5,11 @@ import {
   usageOf,
   commandHelpText,
   allHelpText,
-} from './help.js';
-import { getEntries, getFreqMap, setEntries, importEntries } from '../core/data.js';
+} from './helper.js';
+import { getEntries, getFreqMap, setEntries, importEntries, mergeFreq } from '../core/data.js';
 import { search } from '../core/query.js';
 import { parseKVText, escapeKVKey, formatKVEntry } from '../core/kvFormat.js';
+import { copyText, downloadText } from '../core/utils.js';
 
 // 搜索命令
 function cmdGet(app, args) {
@@ -38,24 +39,36 @@ function cmdGet(app, args) {
   app.setResults(results);
 }
 
-// 编辑命令：弹出全屏编辑器，保存后更新数据
+// 编辑命令：弹出编辑器，保存后更新数据，不显示条目
 function cmdEdit(app) {
+  app.setResults([]);
   const text = entriesToText();
   app.showEditor(text, (newText) => {
     const parsed = parseKVText(newText);
+    let msg = '';
+
     if (parsed.tags.length) {
       setEntries(parsed.tags.map(t => ({ k: t.key, v: t.value })));
-      for (const [k, v] of Object.entries(parsed.freqs)) {
-        app.state.freqMap[k] = v;
-      }
-      app.log(`saved (${getEntries().length} entries)`);
+      mergeFreq(parsed.freqs);
+      msg = `saved (${getEntries().length} entries)`;
+    } else {
+      msg = `error: no valid entries saved.`;
     }
+
+    if (parsed.invalidLines.length) {
+      msg += `
+skipped:
+${parsed.invalidLines.join('\n')}`;
+    }
+
+    app.log(msg);
     app.render();
   });
 }
 
-// 导入命令：弹出编辑器，支持 replace / append / overwrite 模式
+// 导入命令：弹出编辑器，不显示条目
 function cmdImport(app, args) {
+  app.setResults([]);
   const mode = args[0] === '-a' ? 'append' : args[0] === '-o' ? 'overwrite' : 'replace';
   app.showEditor('', (text) => {
     const parsed = parseKVText(text);
@@ -68,36 +81,30 @@ function cmdImport(app, args) {
   });
 }
 
-// 导出命令：默认下载为文本文件，-c 复制到剪贴板
+// 导出命令：不显示条目
 function cmdExport(app, args) {
+  app.setResults([]);
   const text = entriesToText();
 
+
   if (!args.length || args[0] === '-f') {
-    const blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'kv_data.txt';
-    a.click();
-    setTimeout(() => URL.revokeObjectURL(url), 100);
+    downloadText(text, 'kv_data.txt');
     app.log('Exported as kv_data.txt');
     return;
   }
 
   if (args[0] === '-c') {
-    navigator.clipboard.writeText(text).then(() => {
-      app.log('Copied to clipboard.');
-    }).catch(() => {
-      app.log('error: Failed to copy to clipboard.');
-    });
+    copyText(text);
+    app.log('Copied to clipboard.');
     return;
   }
 
   throw new Error(`unknown option: ${args[0]}\n${usageOf('export')}`);
 }
 
-// 帮助命令：可查看全部或单个命令的详细帮助
+// 帮助命令：不显示条目
 function cmdHelp(app, args) {
+  app.setResults([]);
   const name = args[0];
   if (name) {
     app.log(commandHelpText(name));
@@ -106,7 +113,6 @@ function cmdHelp(app, args) {
   }
 }
 
-// 将当前所有条目和频率序列化为可编辑文本
 function entriesToText() {
   const entries = getEntries();
   const freqMap = getFreqMap();
@@ -120,7 +126,6 @@ function entriesToText() {
   return lines.join('\n');
 }
 
-// 命令派发入口，统一处理 -h 帮助标志
 export async function runCommand(app, line) {
   const { name, args } = parseCommand(line);
   if (!name) return;
@@ -128,7 +133,6 @@ export async function runCommand(app, line) {
   app.log(`> ${line}`);
 
   try {
-    // 任何非 help 命令携带 -h 或 --help 时，显示该命令的帮助并返回
     if (name !== 'help' && hasHelpFlag(args)) {
       app.log(commandHelpText(name));
       app.render();

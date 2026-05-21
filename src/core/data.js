@@ -88,6 +88,12 @@ export function importEntries(newEntries, mode = 'replace') {
   save();
 }
 
+/** 合并外部频率对象（编辑/导入时使用） */
+export function mergeFreq(newFreq) {
+  Object.assign(freqMap, newFreq);
+  save();
+}
+
 /** 运行时构建搜索索引，返回 { keywordMap, sortedKeywords } */
 export function buildIndex() {
   const keywordMap = Object.create(null);
