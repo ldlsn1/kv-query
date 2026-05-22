@@ -11,16 +11,18 @@ export function createApp(root) {
   const app = {
     state,
 
+    // 输出日志
     log(msg) {
       state.logs.push(msg);
       if (state.logs.length > 500) state.logs.shift();
     },
 
+    // 用于显示带有点击复制功能的条目列表
     setResults(entries) {
-      state.results = entries;
+        state.results = entries;
     },
 
-    /** 弹出全屏编辑器 */
+    // 弹出全屏编辑器
     showEditor(text, onSave) {
       const overlay = document.createElement('div');
       overlay.className = 'edit-overlay';

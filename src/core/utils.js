@@ -3,20 +3,24 @@
  * 失败则弹出 alert 提示手动复制。
  */
 export function copyText(text) {
-  // 尝试 execCommand（兼容性最好）
   const ta = document.createElement('textarea');
   ta.value = text;
   ta.style.position = 'fixed';
   ta.style.left = '-9999px';
   document.body.appendChild(ta);
   ta.select();
+
+  let ok = false;
   try {
-    const ok = document.execCommand('copy');
-    if (ok) return; // 成功
-  } catch { }
+    ok = document.execCommand('copy');
+  } catch { /* ignore */ }
+
+  // 无论成功与否，务必移除临时 textarea
   document.body.removeChild(ta);
 
-  // 降级尝试 Clipboard API（某些现代浏览器）
+  if (ok) return;
+
+  // 降级尝试 Clipboard API
   if (navigator.clipboard && window.isSecureContext) {
     navigator.clipboard.writeText(text).catch(() => {
       alert('Copy failed, please copy manually.');

@@ -46,8 +46,7 @@ examples:
     desc: `default: replace all entries
 
 options:
-  -a     append (skip duplicates)
-  -o     append and overwrite existing keys
+  -a     append directly
 
 notes:
   opens an editor to paste text data

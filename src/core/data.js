@@ -1,116 +1,113 @@
 /**
- * 数据中心：条目管理、频率维护、索引构建、localStorage 存取
+ * 数据中心：
+ * - 持久化 rawEntryText (用户原始条目文本) 和 freqMap (点击频率)
+ * - 维护 entries 数组和搜索索引作为内存缓存
+ * - 数据变更后立即重建缓存
  */
 
+import { parseKVText, escapeKVKey } from './kvFormat.js';
 import { KV_DATA } from '../../data/raw.js';
 
-const SEP = ' | ';
-const STORAGE_KEY = 'kv_entries';
-const FREQ_KEY = 'kv_freq';
+const RAW_KEY = 'kv_raw';    // 存储原始条目文本
+const FREQ_KEY = 'kv_freq';  // 存储频率映射
 
-let entries = [];
+// 持久化数据
+let rawEntryText = '';       // 用户编辑区 `---` 之前的完整文本
 let freqMap = {};
 
-// 首次加载时转换示例数据
-function defaultEntries() {
-  return Object.entries(KV_DATA).map(([k, v]) => ({ k, v }));
+// 内存缓存 (不持久化)
+let entries = [];            // 解析后的条目数组 { k, v }
+let cachedIndex = null;      // 搜索索引 { keywordMap, sortedKeywords }
+
+/** 生成默认原始文本（首次使用时） */
+function defaultRawText() {
+  return Object.entries(KV_DATA)
+    .map(([k, v]) => `"${escapeKVKey(k)}" ${v}`)
+    .join('\n');
 }
 
-/** 从 localStorage 恢复 */
+/** 从原始文本重建 entries 并立即构建搜索索引 */
+function rebuildEntries() {
+  const parsed = parseKVText(rawEntryText + '\n---'); // 借用解析，只取 tags
+  entries = parsed.tags.map(t => ({ k: t.key, v: t.value }));
+
+  // 立即基于新 entries 构建索引缓存
+  cachedIndex = buildIndexFromEntries(entries);
+}
+
+/** 从条目数组构建搜索索引（纯函数） */
+function buildIndexFromEntries(entries) {
+  const keywordMap = Object.create(null);
+  entries.forEach(({ k }, id) => {
+    // 标签用 " | " 分隔
+    k.split(' | ').forEach(key => {
+      if (!keywordMap[key]) keywordMap[key] = [];
+      keywordMap[key].push(id);
+    });
+  });
+  // 对每个关键词的 ID 列表排序（优化交集运算）
+  for (const key in keywordMap) {
+    keywordMap[key].sort((a, b) => a - b);
+  }
+  const sortedKeywords = Object.keys(keywordMap).sort();
+  return { keywordMap, sortedKeywords };
+}
+
+// 初始化
 export function load() {
   try {
-    entries = JSON.parse(localStorage.getItem(STORAGE_KEY));
+    rawEntryText = localStorage.getItem(RAW_KEY);
     freqMap = JSON.parse(localStorage.getItem(FREQ_KEY) || '{}');
-    if (!entries || !entries.length) {
-      entries = defaultEntries();
+    if (!rawEntryText) {
+      // 首次使用，用默认数据填充原始文本
+      rawEntryText = defaultRawText();
       freqMap = {};
-      save();
     }
   } catch {
-    entries = defaultEntries();
+    rawEntryText = defaultRawText();
     freqMap = {};
   }
+  // 启动时立即解析并构建索引
+  rebuildEntries();
 }
 
-/** 持久化 */
 export function save() {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(entries));
+  localStorage.setItem(RAW_KEY, rawEntryText);
   localStorage.setItem(FREQ_KEY, JSON.stringify(freqMap));
 }
 
-/** 返回当前条目数组 */
+// 数据访问器
+export function getRawText() {
+  return rawEntryText;
+}
+
+/** 设置原始文本（编辑/导入的唯一入口），触发缓存重建 */
+export function setRawText(text) {
+  rawEntryText = text;
+  rebuildEntries();  // 解析 + 索引立即重建
+  save();
+}
+
 export function getEntries() {
   return entries;
 }
 
-/** 增加指定 key 的点击频率并保存 */
-export function addFreq(key) {
-  freqMap[key] = (freqMap[key] || 0) + 1;
-  save();
-}
-
-/** 获取频率映射（只读） */
 export function getFreqMap() {
   return freqMap;
 }
 
-/** 用新条目数组完全替换当前数据 */
-export function setEntries(newEntries) {
-  entries = [...newEntries];
-  // 清理不存在的 key 的频率
-  const validKeys = new Set(entries.map(e => e.k));
-  for (const k of Object.keys(freqMap)) {
-    if (!validKeys.has(k)) delete freqMap[k];
-  }
-  save();
+export function addFreq(key) {
+  freqMap[key] = (freqMap[key] || 0) + 1;
+  save();   // 频率变化持久化，但不影响索引
 }
 
-/** 追加条目（支持 append / overwrite 模式） */
-export function importEntries(newEntries, mode = 'replace') {
-  if (mode === 'replace') {
-    setEntries(newEntries);
-    return;
-  }
-
-  const existingKeys = new Set(entries.map(e => e.k));
-  if (mode === 'append') {
-    entries = entries.concat(newEntries.filter(e => !existingKeys.has(e.k)));
-  } else if (mode === 'overwrite') {
-    const map = new Map(entries.map(e => [e.k, e]));
-    for (const e of newEntries) map.set(e.k, e);
-    entries = [...map.values()];
-  }
-
-  const validKeys = new Set(entries.map(e => e.k));
-  for (const k of Object.keys(freqMap)) {
-    if (!validKeys.has(k)) delete freqMap[k];
-  }
-  save();
-}
-
-/** 合并外部频率对象（编辑/导入时使用） */
+/** 合并外部频率（编辑或导入时用户可能手动修改频率区） */
 export function mergeFreq(newFreq) {
   Object.assign(freqMap, newFreq);
   save();
 }
 
-/** 运行时构建搜索索引，返回 { keywordMap, sortedKeywords } */
-export function buildIndex() {
-  const keywordMap = Object.create(null);
-  
-  entries.forEach(({ k }, id) => {
-    const keys = k.split(SEP);
-    for (const key of keys) {
-      if (!keywordMap[key]) keywordMap[key] = [];
-      keywordMap[key].push(id);
-    }
-  });
-
-  // 排序 ID 数组以优化交集
-  for (const key in keywordMap) {
-    keywordMap[key].sort((a, b) => a - b);
-  }
-
-  const sortedKeywords = Object.keys(keywordMap).sort();
-  return { keywordMap, sortedKeywords };
+/** 返回缓存的搜索索引（总是最新） */
+export function getIndex() {
+  return cachedIndex;
 }
