@@ -5,7 +5,7 @@ import { renderPanel } from './panelView.js';
 export function createApp(root) {
   const state = {
     logs: [],
-    results: [],       // 当前搜索结果
+    results: [], // 当前搜索结果
   };
 
   const app = {
@@ -68,8 +68,6 @@ export function createApp(root) {
 
   // 初始化
   load();
-  state.results = [];  // 初始不显示任何条目
-  state.logs = [];
 
   // 绑定 CLI 表单
   const form = root.querySelector('#cliForm');

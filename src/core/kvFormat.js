@@ -13,6 +13,21 @@ const ESCAPE_CHARS = {
 export const escapeHTML = str => str.replace(/[&<>"]/g, char => ESCAPE_CHARS[char]);
 
 /**
+ * 转义键中的反斜杠和双引号，保证用双引号包裹时不破坏边界。
+ * 只做最小转义，与 parseKVLine 配合保证可逆。
+ */
+export function escapeKVKey(key) {
+  return key.replace(/\\/g, '\\\\').replace(/"/g, '\\"');
+}
+
+/**
+ * 将键值格式化为一行 "key" value
+ */
+export function formatKVEntry(key, value) {
+  return `"${escapeKVKey(key)}" ${value}`;
+}
+
+/**
  * 解析一行文本，提取双引号包裹的键和剩余部分作为值。
  * 例：  "apple | fruit | red" A sweet red fruit
  * 返回： { key: "apple | fruit | red", value: "A sweet red fruit" }
@@ -90,16 +105,17 @@ export function parseKVText(text) {
 
 
 /**
- * 转义键中的反斜杠和双引号，保证用双引号包裹时不破坏边界。
- * 只做最小转义，与 parseKVLine 配合保证可逆。
+ * 解析完整的编辑/导入文本（含可能的分隔线 ---）
+ * @param {string} fullText 完整文本
+ * @returns {{ entryText: string, freqs: Record<string, number>, invalidLines: string[] }}
  */
-export function escapeKVKey(key) {
-  return key.replace(/\\/g, '\\\\').replace(/"/g, '\\"');
-}
+export function parseFullText(fullText) {
+  // 取第一个 "---" 行分隔符之前的内容作为标签区
+  const sepIdx = fullText.indexOf('\n---');
+  const entryText = sepIdx !== -1 ? fullText.slice(0, sepIdx) : fullText;
 
-/**
- * 将键值格式化为一行 "key" value
- */
-export function formatKVEntry(key, value) {
-  return `"${escapeKVKey(key)}" ${value}`;
+  // 用 parseKVText 解析频率和无效行
+  const { freqs, invalidLines } = parseKVText(fullText);
+
+  return { entryText, freqs, invalidLines };
 }

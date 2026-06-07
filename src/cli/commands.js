@@ -1,7 +1,6 @@
 import { parseCommand } from './parser.js';
 import {
   HELP,
-  hasHelpFlag,
   usageOf,
   commandHelpText,
   allHelpText,
@@ -14,8 +13,8 @@ import {
   mergeFreq,
 } from '../core/data.js';
 import { search } from '../core/query.js';
-import { parseKVText, escapeKVKey } from '../core/kvFormat.js';
-import { copyText, downloadText } from '../core/utils.js';
+import { parseKVText, escapeKVKey, parseFullText } from '../core/kvFormat.js';
+import { copyText, downloadText, pickTextFile } from '../core/utils.js';
 
 // 搜索命令
 function cmdGet(app, args) {
@@ -38,72 +37,85 @@ function cmdGet(app, args) {
   app.setResults(sorted);
 
   if (!sorted.length) {
-    app.log('(no results)');
+    app.log('no results');
   }
 }
 
-// 编辑命令
+/**
+ * 编辑命令：弹出编辑器，让用户修改标签区和频率
+ */
 function cmdEdit(app) {
-  // 获取原始条目文本和当前频率映射
+  // 构建编辑区初始内容：标签区 + --- + 频率行（只显示频率 >0）
   const raw = getRawText();
   const freqMap = getFreqMap();
   const entries = getEntries();
 
-  // 构建频率区文本（只包含频率 > 0 的条目）
   const freqLines = entries
     .filter(e => freqMap[e.k] > 0)
     .map(e => `"${escapeKVKey(e.k)}" ${freqMap[e.k]}`);
 
-  // 拼接完整文本：条目行 + --- + 频率行
   const fullText = freqLines.length > 0
     ? raw + '\n---\n' + freqLines.join('\n')
     : raw + '\n---';
 
+  // 弹出编辑器，保存回调中解析并更新
   app.showEditor(fullText, (newText) => {
-    // 解析用户编辑后的完整文本
-    const parsed = parseKVText(newText);
+    const { entryText, freqs, invalidLines } = parseFullText(newText);
 
-    // 提取条目部分（--- 之前的原始行）
-    // 注意：这里不能用 newText.split('---')[0] 因为用户可能在值中包含 ---
-    // 最安全的方法是从 parseKVText 的结果反向组装，
-    // 但 tags 已丢失注释和空行。因此采用保留原始文本的方式：
-    const sepIndex = newText.lastIndexOf('\n---');
-    const entryText = sepIndex !== -1 ? newText.slice(0, sepIndex).trimEnd() : newText.trimEnd();
-    
-    // 保存条目文本（包含注释、空行等）
     setRawText(entryText);
-    // 合并用户手动调整的频率
-    mergeFreq(parsed.freqs);
+    mergeFreq(freqs);
 
-    let msg = `saved (${getEntries().length} entries)`;
-    if (parsed.invalidLines.length) {
-      msg += `\nskipped:\n${parsed.invalidLines.join('\n')}`;
+    let msg = `saved ${getEntries().length} entries`;
+    if (invalidLines.length) {
+      msg += `\nskipped:\n${invalidLines.join('\n')}`;
     }
     app.log(msg);
     app.render();
   });
 }
 
-// 导入命令
-function cmdImport(app, args) {
-  const mode = args[0] === '-a' ? 'append' : 'replace';  // 不再处理 '-o'
-  app.showEditor('', (text) => {
-    const parsed = parseKVText(text + '\n---');
-    let newRaw;
+/**
+ * 导入命令：从编辑器或文件导入数据
+ * 支持 -a（追加）和 -f（从文件读取）
+ */
+async function cmdImport(app, args) {
+  const mode = args.includes('-a') ? 'append' : 'replace';
 
-    if (mode === 'replace') {
-      newRaw = text;
-    } else { // append
-      const current = getRawText();
-      newRaw = current ? current + '\n' + text : text;
-    }
+  // 获取文本：-f 通过文件选择，否则弹出编辑器
+  let text;
+  if (args.includes('-f')) {
+    text = await pickTextFile();
+    if (!text) return; // 用户取消文件选择
+  } else {
+    text = await new Promise(resolve => {
+      app.showEditor('', resolve, () => resolve(null));
+    });
+    if (!text) return; // 用户取消编辑器
+  }
 
-    setRawText(newRaw);
-    mergeFreq(parsed.freqs);
-    app.log(`imported (mode: ${mode}, ${getEntries().length} entries)`);
-    app.render();
-  });
+  // 解析出标签区、频率和无效行
+  const { entryText, freqs, invalidLines } = parseFullText(text);
+
+  // 合并/替换标签区
+  if (mode === 'append') {
+    const current = getRawText();
+    setRawText(current ? current + '\n' + entryText : entryText);
+  } else {
+    setRawText(entryText);
+  }
+
+  // 合并频率（新增或覆盖）
+  mergeFreq(freqs);
+
+  // 输出结果
+  let msg = `imported (mode: ${mode}, ${getEntries().length} entries)`;
+  if (invalidLines.length) {
+    msg += `\nskipped:\n${invalidLines.join('\n')}`;
+  }
+  app.log(msg);
+  app.render();
 }
+
 
 // 导出命令
 function cmdExport(app, args) {
@@ -120,10 +132,10 @@ function cmdExport(app, args) {
 
   if (!args.length || args[0] === '-f') {
     downloadText(fullText, 'kv_data.txt');
-    app.log('Exported as kv_data.txt');
+    app.log('exported as kv_data.txt');
   } else if (args[0] === '-c') {
     copyText(fullText);
-    app.log('Copied to clipboard.');
+    app.log('copied to clipboard.');
   } else {
     throw new Error(`unknown option: ${args[0]}\n${usageOf('export')}`);
   }
@@ -144,17 +156,20 @@ export async function runCommand(app, line) {
   const { name, args } = parseCommand(line);
   if (!name) return;
 
+  // 重置结果，避免旧数据被非搜索命令展示
+  app.state.results = [];
+
   app.log(`> ${line}`);
 
   try {
-    if (name !== 'help' && hasHelpFlag(args)) {
+    if (name !== 'help' && args.includes('-h')) {
       app.log(commandHelpText(name));
       app.render();
       return;
     }
 
     switch (name) {
-      case 'help': case '-h': case 'h':
+      case 'help': case '-h':
         cmdHelp(app, args);
         break;
       case 'get':
