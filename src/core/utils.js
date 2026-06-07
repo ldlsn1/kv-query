@@ -15,7 +15,7 @@ export function copyText(text) {
     ok = document.execCommand('copy');
   } catch { /* ignore */ }
 
-  // 无论成功与否，务必移除临时 textarea
+  // 无论成功与否，务必移除临时 textarea，避免焦点问题
   document.body.removeChild(ta);
 
   if (ok) return;

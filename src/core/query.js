@@ -1,10 +1,10 @@
+import { getEntries, getIndex } from './data.js';
+
 /**
  * 搜索逻辑：基于 data 模块提供的索引缓存进行查询
  */
 
-import { getEntries, getIndex } from './data.js';
-
-/** 数组交集 */
+// 数组交集，大规模情况可以用双指针提高效率
 function intersect(arrays) {
   if (!arrays.length) return [];
   return arrays.reduce((a, b) => {
@@ -13,38 +13,34 @@ function intersect(arrays) {
   });
 }
 
-/** 数组并集 */
+// 数组并集
 function union(arrays) {
-  return [...new Set(arrays.flat())].sort((a, b) => a - b);
+  return [...new Set(arrays.flat())];
 }
 
 /**
- * @param {string[]} terms 搜索词
+ * @param {string[]} terms  搜索词
  * @param {boolean} strict  true=严格匹配标签，false=包含匹配
  * @param {boolean} isAnd   true=AND 逻辑，false=OR
  * @returns {Array<{k, v}>} 匹配的条目
  */
 export function search(terms, strict, isAnd) {
-  const { keywordMap, sortedKeywords } = getIndex(); // 直接使用缓存索引
+  const { keywordMap, sortedKeywords } = getIndex();
   const entries = getEntries();
 
   const matchGroups = terms.map(term => {
     const ids = new Set();
-    if (strict) {
-      // 严格匹配：直接从关键词映射中找
+    if (strict) { // 严格匹配：直接从关键词映射中找
       if (keywordMap[term]) keywordMap[term].forEach(id => ids.add(id));
     } else {
-      // 包含匹配：检查所有关键词及条目的 value
-      for (const kw of sortedKeywords) {
+      for (const kw of sortedKeywords) { // 包含匹配：检查所有关键词
         if (kw.includes(term)) keywordMap[kw].forEach(id => ids.add(id));
       }
-      entries.forEach((entry, idx) => {
-        if (entry.v.includes(term)) ids.add(idx);
-      });
     }
-    return [...ids].sort((a, b) => a - b);
+    return [...ids];
   });
 
   const resultIds = isAnd ? intersect(matchGroups) : union(matchGroups);
+  resultIds.sort((a, b) => a - b); // 最终统一排序，只排一次
   return resultIds.map(id => entries[id]);
 }

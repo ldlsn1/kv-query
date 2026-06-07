@@ -4,20 +4,19 @@ export const HELP = {
     usage: 'get <option> [term ...]',
     desc: `options:
   -a     list all entries, sorted by access frequency
-  -s     strict tag match, OR logic
-  -sa    strict tag match, AND logic
-  -c     contains match (key or value), OR logic
-  -ca    contains match (key or value), AND logic
+  -s     strict match, OR logic
+  -sa    strict match, AND logic
+  -c     contains match, OR logic
+  -ca    contains match, AND logic
 
 notes:
   strict mode matches whole tags (split by "|")
-  contains mode matches any substring in key or value
+  contains mode matches any substring in tags
 
 examples:
   get -a
   get -s fruit
   get -sa fruit red
-  get -c vegetable
   get -ca vegetable red`,
   },
 
