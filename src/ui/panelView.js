@@ -1,5 +1,5 @@
 import { addFreq, getFreqMap } from '../core/data.js';
-import { escapeHTML } from '../core/kvFormat.js';
+import { escapeHTML } from '../core/kvFormat.ts';
 import { copyText } from '../core/utils.js';
 
 export function renderPanel(app, container) {
@@ -10,7 +10,7 @@ export function renderPanel(app, container) {
   if (logs.length) {
     for (const line of logs) {
       const div = document.createElement('div');
-      div.className = line.startsWith('>') ? 'cmd-line' : (line.startsWith('error:') ? 'err' : 'info');
+      div.className = line.startsWith('>') ? 'cmd' : (line.startsWith('error:') ? 'err' : 'info');
       div.textContent = line;
       container.appendChild(div);
     }
@@ -26,8 +26,9 @@ export function renderPanel(app, container) {
 
     for (const e of sorted) {
       const div = document.createElement('div');
-      div.innerHTML = `<span class="key">${escapeHTML(e.k)}</span><span class="sep"> : </span><span class="val">${escapeHTML(e.v)}</span>`;
-
+      div.className = 'entry'; // 专属 class
+      div.innerHTML = `<span class="key">${escapeHTML(e.k)}</span>  ${escapeHTML(e.v)}`;
+    
       // 复制 + 加频率 + 闪烁效果
       div.addEventListener('click', () => {
         copyText(e.v);
@@ -35,9 +36,9 @@ export function renderPanel(app, container) {
         div.style.opacity = '0.55';
         setTimeout(() => { div.style.opacity = ''; }, 200);
       });
-
+    
       container.appendChild(div);
-    }
+    }    
   } else if (!logs.length) {
     container.innerHTML = '<div class="info">type `help` to get started.</div>';
   }

@@ -13,8 +13,8 @@ import {
   mergeFreq,
 } from '../core/data.js';
 import { search } from '../core/query.js';
-import { parseKVText, escapeKVKey, parseFullText } from '../core/kvFormat.js';
 import { copyText, downloadText, pickTextFile } from '../core/utils.js';
+import { escapeKVKey, parseFullText } from '../core/kvFormat.ts';
 
 // 搜索命令
 function cmdGet(app, args) {

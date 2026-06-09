@@ -1,4 +1,4 @@
-import { parseKVText, escapeKVKey } from './kvFormat.js';
+import { parseKVText, escapeKVKey } from './kvFormat.ts';
 import { KV_DATA } from '../../data/raw.js';
 
 /**
@@ -28,7 +28,7 @@ function defaultRawText() {
 
 /** 从原始文本重建 entries 并立即构建搜索索引 */
 function rebuildEntries() {
-  const parsed = parseKVText(rawEntryText + '\n---'); // 借用解析，只取 tags
+  const parsed = parseKVText(rawEntryText);
   entries = parsed.tags.map(t => ({ k: t.key, v: t.value }));
   // 立即基于新 entries 构建索引缓存
   cachedIndex = buildIndexFromEntries(entries);

@@ -30,7 +30,7 @@ examples:
     summary: 'edit entries in a textarea',
     usage: 'edit',
     desc: `notes:
-  opens a textarea with the current data for editing.
+  open a textarea with the current data for editing.
   the data consists of two sections separated by a line containing only \`---\`.
 
 edit content structure:
@@ -40,7 +40,8 @@ edit content structure:
 format rules:
   each entry line follows \`"<key>" <value>\`
   • The key is enclosed in double quotes and may contain escaped characters: \`\\"\` for a literal double quote and \`\\\\\` for a backslash.
-  • The value is everything after the closing quote and a single space; it does not need quotes and can contain any characters, including \`---\`.
+  • The value is everything after the closing quote and a single space; it does not need quotes and can contain any characters.
+  • Multiline values are supported using \`"<key>" \`\`\`\`\`\` followed by the content on separate lines, and a line containing only \`\`\`\`\`\` to end.
 
   each frequency line follows \`"<key>" <positive integer>\`
   • The integer represents how many times the entry has been accessed (click frequency).
@@ -51,7 +52,16 @@ format rules:
   the frequency section is optional. If omitted, no frequency changes are applied.
   when you save, the app parses the text, updates entries and frequencies, and rebuilds the search index instantly.
 
-  use \`import\` and \`export\` to manage your data.`,
+  use \`import\` and \`export\` to manage your data.
+
+format example:
+  "tag1 | tag2" some content
+  "tag3" \`\`\`
+  multi-line
+  content
+  \`\`\`
+  ---
+  "tag3" 1`,
   },
   
   import: {

@@ -26,12 +26,18 @@ html, body { height: 100%; background: #1e1e1e; color: #d4d4d4; }
   white-space: pre-wrap; word-break: break-all;
 }
 
+/* 所有 panel 直系子元素的基础内边距 */
 .panel > div { padding: 1px 14px; }
+/* 结果条目的截断样式 */
+.panel .entry {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+  overflow: hidden;
+}
 .panel .key { color: #569cd6; }
-.panel .sep { color: #6a6a6a; }
-.panel .val { color: #ce9178; }
-.panel .cmd-line { color: #c586c0; }
 .panel .info { color: #6a9955; }
+.panel .cmd { color: #c586c0; }
 .panel .err { color: #f44747; }
 
 .edit-overlay {
