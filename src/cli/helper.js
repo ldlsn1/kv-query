@@ -1,8 +1,10 @@
 export const HELP = {
   get: {
-    summary: 'search entries by tags or text',
+    summary: 'get entries by searching tags',
     usage: 'get <option> [term ...]',
-    desc: `options:
+    desc: `alias: g
+
+options:
   -a     list all entries, sorted by access frequency
   -s     strict match, OR logic
   -sa    strict match, AND logic
@@ -18,6 +20,13 @@ examples:
   get -s fruit
   get -sa fruit red
   get -ca vegetable red`,
+  },
+
+  g: {
+    summary: 'alias for get',
+    usage: 'g <option> [term ...]',
+    desc: `notes:
+  \`help get\` for full details.`,
   },
 
   ls: {
@@ -41,7 +50,7 @@ format rules:
   each entry line follows \`"<key>" <value>\`
   • The key is enclosed in double quotes and may contain escaped characters: \`\\"\` for a literal double quote and \`\\\\\` for a backslash.
   • The value is everything after the closing quote and a single space; it does not need quotes and can contain any characters.
-  • Multiline values are supported using \`"<key>" \`\`\`\`\`\` followed by the content on separate lines, and a line containing only \`\`\`\`\`\` to end.
+  • Multiline values are supported using \`"<key>" \`\`\`\\n...\\n\`\`\`\`.
 
   each frequency line follows \`"<key>" <positive integer>\`
   • The integer represents how many times the entry has been accessed (click frequency).
