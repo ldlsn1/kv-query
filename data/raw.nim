@@ -1,0 +1,1 @@
+const KV_DATA* = ["apple | fruit | red","A sweet red fruit","banana | fruit | yellow","A long yellow fruit","carrot | vegetable | orange","A crunchy orange root","tomato | fruit | red | vegetable","Botanically a fruit, culinarily a vegetable","grape | fruit | purple","Small round fruit for wine"]

@@ -2,11 +2,13 @@
   "name": "kv_query_app",
   "version": "1.0.0",
   "type": "module",
-  "private": true,
   "scripts": {
     "dev": "vite",
     "build": "node scripts/build_index.js && vite build && node scripts/postbuild.js",
     "build:index": "node scripts/build_index.js",
+    "build:bin": "nim c -d:release --out:dist/kv_query --mm:orc --passL:\"-s\" src/terminal/main.nim",
+    "build:nim": "node scripts/js_data_to_nim.js && npm run build:bin",
+    "query": "./dist/kv_query",
     "preview": "vite preview"
   },
   "devDependencies": {

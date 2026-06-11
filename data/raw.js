@@ -1,4 +1,4 @@
-// 严格使用 " | " 分隔
+// Strictly use " | " as separator
 export const KV_DATA = [
   "apple | fruit | red", "A sweet red fruit",
   "banana | fruit | yellow", "A long yellow fruit",
