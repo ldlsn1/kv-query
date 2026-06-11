@@ -11,7 +11,7 @@ import {
   getRawText,
   setRawText,
   mergeFreq,
-} from '../core/data.js';
+} from '../core/data.ts';
 import { search } from '../core/query.js';
 import { copyText, downloadText, pickTextFile } from '../core/utils.js';
 import { escapeKVKey, parseFullText } from '../core/kvFormat.ts';
@@ -188,7 +188,7 @@ export async function runCommand(app, line) {
         cmdExport(app, args);
         break;
       default:
-        throw new Error(`unknown command: ${name}\nType \`help\` to see available commands.`);
+        throw new Error(`unknown command: ${name}\ntype \`help\` to see available commands.`);
     }
   } catch (err) {
     app.log(`error: ${err.message || err}`);

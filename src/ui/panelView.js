@@ -1,4 +1,4 @@
-import { addFreq, getFreqMap } from '../core/data.js';
+import { addFreq, getFreqMap } from '../core/data.ts';
 import { escapeHTML } from '../core/kvFormat.ts';
 import { copyText } from '../core/utils.js';
 

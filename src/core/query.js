@@ -1,4 +1,4 @@
-import { getEntries, getIndex } from './data.js';
+import { getEntries, getIndex } from './data.ts';
 
 /**
  * 搜索逻辑：基于 data 模块提供的索引缓存进行查询
@@ -25,7 +25,7 @@ function union(arrays) {
  * @returns {Array<{k, v}>} 匹配的条目
  */
 export function search(terms, strict, isAnd) {
-  const { keywordMap, sortedKeywords } = getIndex();
+  const { m: keywordMap, k: sortedKeywords } = getIndex();
   const entries = getEntries();
 
   const matchGroups = terms.map(term => {
