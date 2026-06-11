@@ -1,6 +1,6 @@
 import { addFreq, getFreqMap } from '../core/data.ts';
 import { escapeHTML } from '../core/kvFormat.ts';
-import { copyText } from '../core/utils.js';
+import { copyText } from './utils.js';
 
 export function renderPanel(app, container) {
   container.innerHTML = '';
@@ -16,20 +16,14 @@ export function renderPanel(app, container) {
     }
   }
 
-  // 显示结果列表（如果有）
+  // 显示结果列表（已由 cmdGet 按频率排序）
   const results = app.state.results;
   if (results && results.length) {
-    const freqMap = getFreqMap();
-    const sorted = [...results].sort((a, b) =>
-      (freqMap[b.k] || 0) - (freqMap[a.k] || 0)
-    );
-
-    for (const e of sorted) {
+    for (const e of results) {
       const div = document.createElement('div');
-      div.className = 'entry'; // 专属 class
+      div.className = 'entry';
       div.innerHTML = `<span class="key">${escapeHTML(e.k)}</span>  ${escapeHTML(e.v)}`;
     
-      // 复制 + 加频率 + 闪烁效果
       div.addEventListener('click', () => {
         copyText(e.v);
         addFreq(e.k);

@@ -43,4 +43,4 @@ export const INDEX = ${JSON.stringify(INDEX, null, 2)};
 const outputPath = path.resolve('data/index.js');
 fs.writeFileSync(outputPath, content, 'utf-8');
 console.log(`✓ Cache built: ${outputPath}`);
-console.log(`   Entries: ${entries.length}, Keywords: ${sortedKeywords.length}`);
+console.log(`  Entries: ${entries.length}, Keywords: ${sortedKeywords.length}`);
