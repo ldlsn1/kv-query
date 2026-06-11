@@ -12,7 +12,7 @@ import {
   setRawText,
   mergeFreq,
 } from '../core/data.ts';
-import { search } from '../core/query.js';
+import { search } from '../core/query.ts';
 import { escapeKVKey, parseFullText } from '../core/kvFormat.ts';
 import { copyText, downloadText, pickTextFile } from '../ui/utils.js';
 

@@ -41,7 +41,7 @@ function defaultRawText(): string {
 function rebuildEntries(): void {
   // 解析原始文本，获得标签和无效行（这里只取标签部分）
   const parsed = parseKVText(rawEntryText);
-  entries = parsed.tags.map(t => ({ k: t.key, v: t.value }));
+  entries = parsed.tags.map(t => ({ k: t.k, v: t.v }));
 
   // 构建倒排索引：关键词 -> 包含该词的条目 ID 列表
   const keywordMap: Record<string, number[]> = Object.create(null);

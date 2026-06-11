@@ -17,15 +17,9 @@
 
 // 类型定义
 
-/** 一个键值条目 */
-export interface KVEntry {
-  key: string;
-  value: string;
-}
-
 /** parseKVText（纯标签区）的返回值 */
 export interface ParsedKVText {
-  tags: KVEntry[];
+  tags: { k: string; v: string }[]; // 一个键值对条目
   invalidLines: string[];
 }
 
@@ -74,17 +68,17 @@ export function formatKVEntry(key: string, value: string): string {
  * - 键的结束双引号后 **必须紧跟一个空格** 作为键值分隔符
  * - 空格之后的所有内容（包括可能的尾部空格）作为值原样保留
  */
-function parseKVLine(line: string): KVEntry | null {
+function parseKVLine(line: string): { k: string; v: string } | null {
   if (line[0] !== '"') return null;
 
   let i = 1;
-  let key = '';
+  let k = '';
   let escaped = false;
 
   for (; i < line.length; i++) {
     const c = line[i];
     if (escaped) {
-      key += c;
+      k += c;
       escaped = false;
       continue;
     }
@@ -96,15 +90,14 @@ function parseKVLine(line: string): KVEntry | null {
       i++; // 跳过结束引号
       break;
     }
-    key += c;
+    k += c;
   }
 
   // 结束引号后必须是空格，否则格式错误
   if (line[i] !== ' ') return null;
 
   // 值从空格后开始，保留所有字符
-  const value = line.slice(i + 1);
-  return { key, value };
+  return { k, v: line.slice(i + 1) };
 }
 
 /**
@@ -119,15 +112,15 @@ function parseKVLine(line: string): KVEntry | null {
  * 否则 "key" ``` 会被当作单行值处理（值为 ```）。
  */
 export function parseKVText(text: string): ParsedKVText {
-  const tags: KVEntry[] = [];
+  const tags: { k: string; v: string }[] = [];
   const invalidLines: string[] = [];
-  let multiline: { key: string; lines: string[] } | null = null;
+  let multiline: { k: string; lines: string[] } | null = null;
 
   for (const [idx, rawLine] of text.split('\n').entries()) {
     // 多行收集模式
     if (multiline) {
       if (rawLine === '```') {
-        tags.push({ key: multiline.key, value: multiline.lines.join('\n') });
+        tags.push({ k: multiline.k, v: multiline.lines.join('\n') });
         multiline = null;
       } else {
         multiline.lines.push(rawLine);
@@ -142,8 +135,8 @@ export function parseKVText(text: string): ParsedKVText {
     const parsed = parseKVLine(rawLine);
     if (parsed) {
       // 如果值正好是 ``` ，则进入多行模式
-      if (parsed.value === '```') {
-        multiline = { key: parsed.key, lines: [] };
+      if (parsed.v === '```') {
+        multiline = { k: parsed.k, lines: [] };
       } else {
         tags.push(parsed);
       }
@@ -156,7 +149,7 @@ export function parseKVText(text: string): ParsedKVText {
 
   // 未闭合的多行内容直接作为值
   if (multiline) {
-    tags.push({ key: multiline.key, value: multiline.lines.join('\n') });
+    tags.push({ k: multiline.k, v: multiline.lines.join('\n') });
   }
 
   return { tags, invalidLines };
@@ -184,9 +177,9 @@ function parseFreqSection(
 
     const parsed = parseKVLine(rawLine);
     if (parsed) {
-      const n = parseInt(parsed.value, 10);
+      const n = parseInt(parsed.v, 10);
       if (!isNaN(n) && n > 0) {
-        freqs[parsed.key] = n;
+        freqs[parsed.k] = n;
         continue;
       }
     }
