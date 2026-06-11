@@ -1,16 +1,17 @@
-# kv_query
+# kv-query
 
-A lightweight, dual-interface key-value query tool for storing and searching tagged entries using a simple, line-based text format.
-The most common search pattern is a direct **key -> value** lookup.
-In practice, though, you often need multiple keys to point to one value, one key to match several values, or even a partial match on the key.
-This project handles exactly those scenarios: get the results you want with minimal typing, while keeping your mental model simple — plain key-value pairs and fast recording.
+A lightweight key-value query tool for storing and searching entries using a simple text format.<br>
+The most common search pattern is a direct **key -> value** lookup.<br>
+In practice, though, you often need multiple keys to point to one value, one key to match several values, or even a partial match on the key.<br>
+This project handles exactly those scenarios: get the results you want with minimal typing while keeping your mental model simple.
 
 ## Features
 
-- Tag-based key-value entries (`"tag1 | tag2" value`)
+- Key-value entries, e.g., `"tag1 | tag2" value`
 - Strict or partial keyword search with AND/OR logic
-- **Web UI** – single HTML with a command-line-like interface.
-- **Terminal CLI** – single native binary.
+- **Web UI**: single HTML with a command-line-like interface.
+- **Terminal CLI**: single native binary.
+> **Note:** The Web UI and Terminal CLI are independent, optional interfaces — you do not need to set up both.
 
 ## Data source
 
@@ -30,7 +31,7 @@ export const KV_DATA = [
 - **Terminal CLI** <- `data/raw.nim` (compiled directly into the binary)
 
 ```nim
-// [k1, v1, k2, v2, ...]
+# [k1, v1, k2, v2, ...]
 const KV_DATA* = [
   "apple | fruit | red", "A sweet red fruit",
   "banana | fruit | yellow", "A long yellow fruit",
@@ -44,8 +45,10 @@ const KV_DATA* = [
 
 ### Start the dev server
 
+You need Node.js ≥ 22.18.0 installed.
+
 ```bash
-# git clone https://github.com/ldlsn1/kv_query.git && cd kv_query/
+# git clone https://github.com/ldlsn1/kv-query.git && cd kv-query/
 
 npm install
 npm run dev  # open http://localhost:5173
@@ -54,7 +57,7 @@ npm run dev  # open http://localhost:5173
 ### Production build
 
 ```bash
-npm run build
+npm run build  # output to dist/index.html
 ```
 
 The build inlines all assets into a single `index.html` that can run offline.
@@ -112,7 +115,7 @@ The web UI stores its data (entries + frequencies) in `localStorage`. On first l
 You need Nim ≥ 2.0.0 installed.
 
 ```bash
-npm run build:nim  # compiles to dist/kv_query
+npm run build:bin  # output to dist/kv_query
 ```
 
 ### Usage

@@ -2,6 +2,10 @@
   "name": "kv_query_app",
   "version": "1.0.0",
   "type": "module",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ldlsn1/kv-query"
+  },
   "scripts": {
     "dev": "vite",
     "check": "tsc --noEmit",
@@ -9,7 +13,7 @@
     "build:index": "node scripts/build_index.js",
     "build:bin": "nim c -d:release --out:dist/kv_query --mm:orc --passL:\"-s\" src/terminal/main.nim",
     "translate": "node scripts/js_data_to_nim.js",
-    "build:nim": "npm run build:bin",
+    "build:nim": "npm run translate && npm run build:bin",
     "query": "./dist/kv_query",
     "preview": "vite preview"
   },
@@ -19,5 +23,7 @@
     "terser": "^5.46.2",
     "typescript": "^6.0.3",
     "vite": "^8.0.16"
-  }
+  },
+  "author": "ldlsn1",
+  "license": "MIT"
 }

@@ -3,3 +3,9 @@ pwd_report.md
 /dist/
 /data/index.js
 /todo.md
+
+.vscode/*
+.idea/
+*.swp
+*.swo
+.session
