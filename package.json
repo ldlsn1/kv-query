@@ -8,7 +8,8 @@
     "build": "node scripts/build_index.js && vite build && node scripts/postbuild.js",
     "build:index": "node scripts/build_index.js",
     "build:bin": "nim c -d:release --out:dist/kv_query --mm:orc --passL:\"-s\" src/terminal/main.nim",
-    "build:nim": "node scripts/js_data_to_nim.js && npm run build:bin",
+    "translate": "node scripts/js_data_to_nim.js",
+    "build:nim": "npm run build:bin",
     "query": "./dist/kv_query",
     "preview": "vite preview"
   },
