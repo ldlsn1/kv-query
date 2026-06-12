@@ -48,7 +48,7 @@ const KV_DATA* = [
 You need Node.js ≥ 22.18.0 installed.
 
 ```bash
-# git clone https://github.com/ldlsn1/kv-query.git && cd kv-query/
+# git clone https://github.com/niooh/kv-query.git && cd kv-query/
 
 npm install
 npm run dev  # open http://localhost:5173
@@ -112,7 +112,7 @@ The web UI stores its data (entries + frequencies) in `localStorage`. On first l
 
 ### Build
 
-You need Nim ≥ 2.0.0 installed.
+You need Nim ≥ 2.0.0 (e.g. Version 2.2.6) installed.
 
 ```bash
 npm run build:bin  # output to dist/kv_query

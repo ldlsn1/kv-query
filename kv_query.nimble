@@ -1,6 +1,6 @@
 # Package
 version       = "1.0.0"
-author        = "ldlsn1"
+author        = "niooh"
 description   = "KV index query tool"
 license       = "MIT"
 srcDir        = "src/terminal"

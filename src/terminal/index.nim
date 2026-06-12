@@ -1,6 +1,6 @@
-## 编译时索引构建
 import std/[algorithm, strutils, tables]
 
+#! 编译时索引构建
 const SEP* = " | "
 
 type
@@ -34,7 +34,7 @@ func buildIndex*(data: openArray[string]): KVIndex =
       else:
         keywordMap[key].add(id)
 
-  # 对每个 ID 列表排序，输出顺序更稳定
+  # 对每个 ID 列表排序
   for key in keywords:
     keywordMap[key].sort(cmp[int])
 

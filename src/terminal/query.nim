@@ -1,6 +1,7 @@
-## 运行时查询逻辑
 import std/[strutils, sets, tables]
 import index
+
+#! 运行时查询逻辑
 
 # 包含匹配：线性扫描
 func findContainsIds*(idx: KVIndex; term: string): seq[int] =

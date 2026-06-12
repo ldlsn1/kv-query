@@ -1,5 +1,3 @@
-## CLI 入口
-
 import std/[os, strformat]
 import ../../data/raw
 import index
@@ -8,7 +6,7 @@ import query
 # 编译时构建索引
 const idx = buildIndex(KV_DATA)
 
-# ANSI 颜色
+# ANSI
 const
   colorBlue = "\e[34m"
   colorDim = "\e[2m"

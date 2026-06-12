@@ -4,7 +4,7 @@
   "type": "module",
   "repository": {
     "type": "git",
-    "url": "https://github.com/ldlsn1/kv-query"
+    "url": "https://github.com/niooh/kv-query"
   },
   "scripts": {
     "dev": "vite",
@@ -12,8 +12,9 @@
     "build": "node scripts/build_index.js && vite build && node scripts/postbuild.js",
     "build:index": "node scripts/build_index.js",
     "build:bin": "nim c -d:release --out:dist/kv_query --mm:orc --passL:\"-s\" src/terminal/main.nim",
-    "translate": "node scripts/js_data_to_nim.js",
     "build:nim": "npm run translate && npm run build:bin",
+    "js2nim": "node scripts/js_data_to_nim.js",
+    "nim2js": "nim r --usenimcache scripts/nim_data_to_js.nim",
     "query": "./dist/kv_query",
     "preview": "vite preview"
   },
@@ -24,6 +25,6 @@
     "typescript": "^6.0.3",
     "vite": "^8.0.16"
   },
-  "author": "ldlsn1",
+  "author": "niooh",
   "license": "MIT"
 }
