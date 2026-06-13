@@ -50,10 +50,11 @@ function cmdEdit(app) {
   const freqMap = getFreqMap();
   const entries = getEntries();
 
-  const freqLines = entries
-    .filter(e => freqMap[e.k] > 0)
-    .map(e => `"${escapeKVKey(e.k)}" ${freqMap[e.k]}`);
-
+  // 从 freqMap 遍历，避免同名 k 重复出现
+  const freqLines = Object.entries(freqMap)
+    .filter(([, count]) => count > 0)
+    .map(([k, count]) => `"${escapeKVKey(k)}" ${count}`);
+  
   const fullText = freqLines.length > 0
     ? raw + '\n---\n' + freqLines.join('\n')
     : raw + '\n---';
@@ -123,10 +124,10 @@ function cmdExport(app, args) {
   const entries = getEntries();
 
   // 构建频率区文本
-  const freqLines = entries
-    .filter(e => freqMap[e.k] > 0)
-    .map(e => `"${escapeKVKey(e.k)}" ${freqMap[e.k]}`);
-
+  const freqLines = Object.entries(freqMap)
+    .filter(([, count]) => count > 0)
+    .map(([k, count]) => `"${escapeKVKey(k)}" ${count}`);
+  
   // 拼接：原始文本 + --- + 频率行
   const fullText = getRawText() + '\n---\n' + freqLines.join('\n');
 

@@ -1,4 +1,7 @@
-# kv-query
+<p align="center">
+  <img src="docs/figures/logo.png" alt="kv-query logo" width="200px"/>
+</p>
+<h1 align="center">kv-query</h1>
 
 A lightweight key-value query tool for storing and searching entries using a simple text format.<br>
 The most common search pattern is a direct **key -> value** lookup.<br>
