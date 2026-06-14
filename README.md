@@ -4,9 +4,8 @@
 <h1 align="center">kv-query</h1>
 
 A lightweight key-value query tool for storing and searching entries using a simple text format.<br>
-The most common search pattern is a direct **key -> value** lookup.<br>
-In practice, though, you often need multiple keys to point to one value, one key to match several values, or even a partial match on the key.<br>
-This project handles exactly those scenarios: **get the results you want with minimal typing while keeping your mental model simple**.
+The most common search pattern is a direct **key -> value** lookup. In practice, though, you often need multiple keys to point to one value, one key to match several values, or even a partial match on the key.<br>
+This project handles exactly those scenarios: ***get the results you want with minimal typing while keeping your mental model simple***.
 
 ## Features
 
@@ -57,7 +56,7 @@ npm install
 npm run dev  # open http://localhost:5173
 ```
 
-### Production build
+### Build
 
 ```bash
 npm run build  # output to dist/index.html
@@ -65,7 +64,9 @@ npm run build  # output to dist/index.html
 
 The build inlines all assets into a single `index.html` that can run offline.
 
-### Commands
+### Usage
+
+#### Commands
 
 Type commands into the input box, then results appear below.
 
@@ -86,7 +87,7 @@ Type commands into the input box, then results appear below.
 Click on a result value to copy it to the clipboard and increase its frequency automatically, and most‑used entries will rise to the top.
 Use `help <command>` (e.g. `help edit`) to see full details and examples for each command.
 
-### Edit / Import / Export text format
+#### Text format for `edit / import / export`
 
 The web UI uses a user-friendly text format for its `edit`, `import`, and `export` commands.
 
@@ -112,7 +113,7 @@ The web UI stores its data (entries + frequencies) in `localStorage`. On first l
 
 ---
 
-## Terminal CLI (Nim)
+## Terminal CLI (Standalone executable)
 
 ### Build
 
@@ -125,17 +126,17 @@ npm run build:bin  # output to dist/kv_query
 ### Usage
 
 ```bash
-./dist/kv_query <command> [terms…]
+./dist/kv_query <command> [terms]
 ```
 
 | Command | Description |
 |---------|-------------|
 | `-h` | Show help |
 | `ls` | List all entries |
-| `-s [term …]` | Strict match, OR logic |
-| `-sa [term …]` | Strict match, AND logic |
-| `-c [term …]` | Contains match, OR logic |
-| `-ca [term …]` | Contains match, AND logic |
+| `-s [terms]` | Strict match, OR logic |
+| `-sa [terms]` | Strict match, AND logic |
+| `-c [terms]` | Contains match, OR logic |
+| `-ca [terms]` | Contains match, AND logic |
 
 ### Example
 
