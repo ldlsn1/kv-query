@@ -9,7 +9,7 @@ This project handles exactly those scenarios: ***get the results you want with m
 
 ## Features
 
-- Key-value entries, e.g., `"tag1 | tag2" value`
+- Easy-to-write key-value entries, e.g., `"tag1 | tag2" value`
 - Strict or partial keyword search with AND/OR logic
 - **Web UI**: single HTML with a command-line-like interface.
 - **Terminal CLI**: single native binary.
@@ -75,16 +75,16 @@ Type commands into the input box, then results appear below.
 | `help` | Show all commands |
 | `help <cmd>` / `<cmd> -h` | Show help for a specific command |
 | `get -a` / `ls` | List all entries, sorted by frequency |
-| `get -s [term …]` | Strict match, OR logic |
-| `get -sa [term …]` | Strict match, AND logic |
-| `get -c [term …]` | Contains match, OR logic |
-| `get -ca [term …]` | Contains match, AND logic |
+| `get -s [terms]` | Strict match, OR logic |
+| `get -sa [terms]` | Strict match, AND logic |
+| `get -c [terms]` | Contains match, OR logic |
+| `get -ca [terms]` | Contains match, AND logic |
 | `add <key> <value>` | Add a new entry to the end |
 | `edit` | Open a textarea with the full data for manual editing |
 | `import` | Replace (`-a` to append) data from a file or an editor |
 | `export` | Download as `kv_data.txt` or copy to clipboard |
 
-Click on a result value to copy it to the clipboard and increase its frequency automatically, and most‑used entries will rise to the top.
+Click on a result value to copy it to the clipboard and increase its frequency automatically, and most‑used entries will rise to the top.<br>
 Use `help <command>` (e.g. `help edit`) to see full details and examples for each command.
 
 #### Text format for `edit / import / export`
