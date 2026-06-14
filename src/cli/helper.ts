@@ -82,19 +82,21 @@ format example:
   },
   
   import: {
-    summary: 'import data from text or file',
-    usage: 'import [-a | -f]',
-    desc: `default: replace all entries via text editor
+    summary: 'import data from file or editor',
+    usage: 'import [-a, -e]',
+    desc: `default: replace all entries by importing from a local file
 
 options:
   -a     append to existing entries
-  -f     import from a local file instead of the editor
+  -e     use text editor to paste/type data instead of file
+  -f     import from file
 
 examples:
-  import        // replace via editor
-  import -a     // append via editor
-  import -f -a  // append from file`,
-  },
+  import        // replace, from file
+  import -a     // append, from file
+  import -e     // replace, via editor
+  import -e -a  // append, via editor`,
+},
   
   export: {
     summary: 'export data as text',

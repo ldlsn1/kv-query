@@ -100,22 +100,22 @@ function cmdEdit(app: App) {
 }
 
 /**
- * 导入命令：从编辑器或文件导入数据
- * 支持 -a（追加）和 -f（从文件读取）
+ * 导入命令：从文件或编辑器导入数据
+ * 默认从本地文件读取，-e 使用编辑器，-a 追加模式
  */
 async function cmdImport(app: App, args: string[]) {
   const mode = args.includes('-a') ? 'append' : 'replace';
 
-  // 获取文本：-f 通过文件选择，否则弹出编辑器
+  // 获取文本：默认文件选择，-e 弹出编辑器
   let text: string | null;
-  if (args.includes('-f')) {
-    text = await pickTextFile();
-    if (!text) return; // 用户取消文件选择
-  } else {
+  if (args.includes('-e')) {
     text = await new Promise<string | null>(resolve => {
       app.showEditor('', resolve);
     });
     if (!text) return; // 用户取消编辑器
+  } else {
+    text = await pickTextFile();
+    if (!text) return; // 用户取消文件选择
   }
 
   // 解析出标签区、频率和无效行
@@ -140,7 +140,6 @@ async function cmdImport(app: App, args: string[]) {
   app.log(msg);
   app.render();
 }
-
 
 // 导出命令
 function cmdExport(app: App, args: string[]) {

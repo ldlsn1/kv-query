@@ -6,7 +6,7 @@
 A lightweight key-value query tool for storing and searching entries using a simple text format.<br>
 The most common search pattern is a direct **key -> value** lookup.<br>
 In practice, though, you often need multiple keys to point to one value, one key to match several values, or even a partial match on the key.<br>
-This project handles exactly those scenarios: get the results you want with minimal typing while keeping your mental model simple.
+This project handles exactly those scenarios: **get the results you want with minimal typing while keeping your mental model simple**.
 
 ## Features
 
@@ -74,13 +74,13 @@ Type commands into the input box, then results appear below.
 | `help` | Show all commands |
 | `help <cmd>` / `<cmd> -h` | Show help for a specific command |
 | `get -a` / `ls` | List all entries, sorted by frequency |
-| `get -s term …` | Strict match, OR logic |
-| `get -sa term …` | Strict match, AND logic |
-| `get -c term …` | Contains match, OR logic |
-| `get -ca term …` | Contains match, AND logic |
+| `get -s [term …]` | Strict match, OR logic |
+| `get -sa [term …]` | Strict match, AND logic |
+| `get -c [term …]` | Contains match, OR logic |
+| `get -ca [term …]` | Contains match, AND logic |
 | `add <key> <value>` | Add a new entry to the end |
 | `edit` | Open a textarea with the full data for manual editing |
-| `import` | Replace (`-a` to append) data from an editor or a file (`-f`) |
+| `import` | Replace (`-a` to append) data from a file or an editor |
 | `export` | Download as `kv_data.txt` or copy to clipboard |
 
 Click on a result value to copy it to the clipboard and increase its frequency automatically, and most‑used entries will rise to the top.
@@ -132,10 +132,10 @@ npm run build:bin  # output to dist/kv_query
 |---------|-------------|
 | `-h` | Show help |
 | `ls` | List all entries |
-| `-s term …` | Strict match, OR logic |
-| `-sa term …` | Strict match, AND logic |
-| `-c term …` | Contains match, OR logic |
-| `-ca term …` | Contains match, AND logic |
+| `-s [term …]` | Strict match, OR logic |
+| `-sa [term …]` | Strict match, AND logic |
+| `-c [term …]` | Contains match, OR logic |
+| `-ca [term …]` | Contains match, AND logic |
 
 ### Example
 
