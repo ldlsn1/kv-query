@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="docs/figures/logo.png" alt="kv-query logo" width="200px"/>
+  <img src="docs/figures/logo.png" alt="kv-query logo" width="160px"/>
 </p>
 <h1 align="center">kv-query</h1>
 

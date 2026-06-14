@@ -1,13 +1,13 @@
 /**
  * 命令行分词器，支持双引号包裹和 \" 转义
  */
-
-export function parseCommand(line = '') {
+export function parseCommand(line: string = ''):
+  { name: string; args: string[] } {
   const args = tokenize(line.trim());
   return { name: args[0] || '', args: args.slice(1) };
 }
 
-function tokenize(line) {
+function tokenize(line: string) {
   const args = [];
   let current = '';
   let inQuote = false;

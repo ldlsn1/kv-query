@@ -1,6 +1,6 @@
 import { addFreq, getFreqMap } from '../core/data.ts';
 import { escapeHTML } from '../core/kvFormat.ts';
-import { copyText } from './utils.js';
+import { copyText } from './utils.ts';
 
 export function renderPanel(app, container) {
   container.innerHTML = '';

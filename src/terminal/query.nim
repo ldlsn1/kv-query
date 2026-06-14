@@ -39,7 +39,7 @@ func union*(sets: seq[seq[int]]): seq[int] =
   for x in combined:
     result.add(x)
 
-# 统一查询接口
+# 查询接口
 func query*(idx: KVIndex; terms: seq[string]; strict: bool; andMode: bool): seq[KVEntry] =
   var groups: seq[seq[int]] = @[]
   for term in terms:

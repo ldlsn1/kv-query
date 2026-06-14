@@ -1,5 +1,5 @@
 import { load } from '../core/data.ts';
-import { runCommand } from '../cli/commands.js';
+import { runCommand } from '../cli/commands.ts';
 import { renderPanel } from './panelView.js';
 
 export function createApp(root) {

@@ -2,7 +2,7 @@
  * 复制文本到剪贴板，优先 execCommand，降级至 Clipboard API，
  * 失败则弹出 alert 提示手动复制。
  */
-export function copyText(text) {
+export function copyText(text: string): void {
   const ta = document.createElement('textarea');
   ta.value = text;
   ta.style.position = 'fixed';
@@ -35,21 +35,21 @@ export function copyText(text) {
  * 弹出文件选择框，读取用户选择的文本文件内容
  * @returns {Promise<string>} 文件文本内容
  */
-export function pickTextFile() {
+export function pickTextFile(): Promise<string> {
   return new Promise((resolve) => {
     const input = document.createElement('input');
     input.type = 'file';
     input.onchange = () => {
-      const file = input.files[0];
+      const file = input.files![0];
       const reader = new FileReader();
-      reader.onload = () => resolve(reader.result);
+      reader.onload = () => resolve(reader.result as string);
       reader.onerror = () => resolve("");
       reader.readAsText(file, 'UTF-8');
     };
-    // 点击取消或关闭对话框时，不会触发 onchange，所以用 focus 兜底，避免内存泄漏
+    // 点击取消或关闭对话框时，不触发 onchange，用 focus 兜底
     const onFocus = () => {
       setTimeout(() => {
-        if (!input.files.length) resolve("");
+        if (!input.files?.length) resolve("");
       }, 300);
       window.removeEventListener('focus', onFocus);
     };
@@ -63,7 +63,7 @@ export function pickTextFile() {
  * @param {string} text 文件内容
  * @param {string} filename 下载文件名
  */
-export function downloadText(text, filename = 'data.txt') {
+export function downloadText(text: string, filename: string = 'data.txt'): void {
   const blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');

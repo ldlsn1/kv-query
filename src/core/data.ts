@@ -16,7 +16,7 @@ let rawEntryText = '';  // 用户编辑区 `---` 之前的完整文本
 let freqMap: Record<string, number> = {}; // 键 -> 点击次数
 
 // 内存缓存 (不持久化)
-let entries: { k: string; v: string }[] = [];   // 解析后的条目数组 { k: 标签, v: 值 }
+let entries: { k: string; v: string }[] = [];  // 解析后的条目数组 { k: 标签, v: 值 }
 let cachedIndex: { m: Record<string, number[]>; k: string[] } | null = null; // 搜索索引：m 为关键词映射，k 为排序后的关键词列表
 
 /**
@@ -25,7 +25,6 @@ let cachedIndex: { m: Record<string, number[]>; k: string[] } | null = null; // 
  */
 function defaultRawText(): string {
   const lines: string[] = [];
-  // KV_DATA 是 [key1, val1, key2, val2, ...] 的扁平结构
   for (let i = 0; i < KV_DATA.length; i += 2) {
     const k = KV_DATA[i];
     const v = KV_DATA[i + 1];
@@ -68,17 +67,16 @@ export function load(): void {
   try {
     rawEntryText = localStorage.getItem(RAW_KEY) ?? '';
     freqMap = JSON.parse(localStorage.getItem(FREQ_KEY) || '{}');
-    if (!rawEntryText) {
-      // 首次使用，用默认数据填充原始文本
+    if (!rawEntryText) { // 首次使用，用默认数据填充原始文本
       rawEntryText = defaultRawText();
       freqMap = {};
     }
   } catch {
-    // localStorage 读取失败或 JSON 解析出错，回退到默认数据
+    // 回退默认
     rawEntryText = defaultRawText();
     freqMap = {};
   }
-  // 无论何种情况，最后都根据 rawEntryText 重建缓存
+  // 无论何种情况，最后都重建缓存
   rebuildEntries();
 }
 
@@ -99,7 +97,7 @@ export function getRawText(): string {
 
 /**
  * 设置新的原始文本（编辑或导入后调用）
- * 会立即触发 entries 和索引的重建，并持久化
+ * 立即触发 entries 和索引的重建，并持久化
  */
 export function setRawText(text: string): void {
   rawEntryText = text;
@@ -127,7 +125,7 @@ export function addFreq(key: string): void {
 }
 
 /**
- * 合并外部频率数据（编辑或导入时可能提供新的频率信息）
+ * 合并外部频率数据
  * 新频率会覆盖已有键，并持久化
  */
 export function mergeFreq(newFreq: Record<string, number>): void {

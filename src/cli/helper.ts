@@ -1,4 +1,4 @@
-export const HELP = {
+export const HELP: Record<string, any> = {
   get: {
     summary: 'get entries by searching tags',
     usage: 'get <option> [term ...]',
@@ -104,7 +104,7 @@ examples:
   },
 };
 
-export function usageOf(name) {
+export function usageOf(name: string): string {
   return `usage: ${HELP[name]?.usage || name}`;
 }
 
@@ -112,7 +112,7 @@ export function usageOf(name) {
  * 生成单个命令的详细帮助文本
  * 对于 'help' 命令本身，直接返回所有命令的总览（避免冗余）
  */
-export function commandHelpText(name) {
+export function commandHelpText(name: string) {
   if (name === 'help') {
     return allHelpText();
   }
@@ -126,7 +126,7 @@ usage:
   ${item.desc}`;
 }
 
-export function allHelpText() {
+export function allHelpText(): string {
   const rows = Object.entries(HELP)
     .map(([name, item]) => `  ${name.padEnd(8)} ${item.summary}`)
     .join('\n');

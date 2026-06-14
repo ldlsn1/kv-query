@@ -1,10 +1,10 @@
-import { parseCommand } from './parser.js';
+import { parseCommand } from './parser.ts';
 import {
   HELP,
   usageOf,
   commandHelpText,
   allHelpText,
-} from './helper.js';
+} from './helper.ts';
 import {
   getEntries,
   getFreqMap,
@@ -14,14 +14,26 @@ import {
 } from '../core/data.ts';
 import { search } from '../core/query.ts';
 import { escapeKVKey, parseFullText } from '../core/kvFormat.ts';
-import { copyText, downloadText, pickTextFile } from '../ui/utils.js';
+import { copyText, downloadText, pickTextFile } from '../ui/utils.ts';
+
+// 应用上下文接口
+export interface App {
+  state: {
+    logs: string[];
+    results: { k: string; v: string }[];
+  };
+  log(msg: string): void;
+  setResults(entries: { k: string; v: string }[]): void;
+  showEditor(text: string, onSave: (newText: string) => void): void;
+  render(): void;
+}
 
 // 搜索命令
-function cmdGet(app, args) {
+function cmdGet(app: App, args: string[]) {
   const opt = args[0];
   const terms = args.slice(1);
 
-  let results;
+  let results: { k: string; v: string }[];
   switch (opt) {
     case '-a': results = getEntries(); break;
     case '-s': results = search(terms, true, false); break;
@@ -44,7 +56,7 @@ function cmdGet(app, args) {
 /**
  * 编辑命令：弹出编辑器，让用户修改标签区和频率
  */
-function cmdEdit(app) {
+function cmdEdit(app: App) {
   // 构建编辑区初始内容：标签区 + --- + 频率行（只显示频率 >0）
   const raw = getRawText();
   const freqMap = getFreqMap();
@@ -60,7 +72,7 @@ function cmdEdit(app) {
     : raw + '\n---';
 
   // 弹出编辑器，保存回调中解析并更新
-  app.showEditor(fullText, (newText) => {
+  app.showEditor(fullText, (newText: string) => {
     const { entryText, freqs, invalidLines } = parseFullText(newText);
 
     setRawText(entryText);
@@ -79,17 +91,17 @@ function cmdEdit(app) {
  * 导入命令：从编辑器或文件导入数据
  * 支持 -a（追加）和 -f（从文件读取）
  */
-async function cmdImport(app, args) {
+async function cmdImport(app: App, args: string[]) {
   const mode = args.includes('-a') ? 'append' : 'replace';
 
   // 获取文本：-f 通过文件选择，否则弹出编辑器
-  let text;
+  let text: string | null;
   if (args.includes('-f')) {
     text = await pickTextFile();
     if (!text) return; // 用户取消文件选择
   } else {
-    text = await new Promise(resolve => {
-      app.showEditor('', resolve, () => resolve(null));
+    text = await new Promise<string | null>(resolve => {
+      app.showEditor('', resolve);
     });
     if (!text) return; // 用户取消编辑器
   }
@@ -119,7 +131,7 @@ async function cmdImport(app, args) {
 
 
 // 导出命令
-function cmdExport(app, args) {
+function cmdExport(app: App, args: string[]) {
   const freqMap = getFreqMap();
   const entries = getEntries();
 
@@ -143,7 +155,7 @@ function cmdExport(app, args) {
 }
 
 // 帮助命令
-function cmdHelp(app, args) {
+function cmdHelp(app: App, args: string[]) {
   const name = args[0];
   if (name) {
     app.log(commandHelpText(name));
@@ -153,7 +165,7 @@ function cmdHelp(app, args) {
 }
 
 // 入口
-export async function runCommand(app, line) {
+export async function runCommand(app: App, line: string) {
   const { name, args } = parseCommand(line);
   if (!name) return;
 
@@ -183,7 +195,7 @@ export async function runCommand(app, line) {
         cmdEdit(app);
         break;
       case 'import':
-        cmdImport(app, args);
+        await cmdImport(app, args);
         break;
       case 'export':
         cmdExport(app, args);
@@ -192,7 +204,8 @@ export async function runCommand(app, line) {
         throw new Error(`unknown command: ${name}\ntype \`help\` to see available commands.`);
     }
   } catch (err) {
-    app.log(`error: ${err.message || err}`);
+    const message = err instanceof Error ? err.message : String(err);
+    app.log(`error: ${message}`);
   } finally {
     app.render();
   }

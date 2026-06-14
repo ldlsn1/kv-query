@@ -4,10 +4,10 @@
  *
  * 格式约定：
  * - 标签区由若干条目组成，每个条目可以是：
- *     "key" value         单行值
- *     "key" ```           多行值起始
+ *     "key" value    单行值
+ *     "key" ```      多行值起始
  *     多行内容...
- *     ```                 多行值结束
+ *     ```            多行值结束
  * - 以 // 开头的行视为注释（忽略）
  * - 完全空行忽略
  * - 标签区与频率区在完整文本中用最后一个 `\n---` 分隔
@@ -31,7 +31,6 @@ export interface ParsedFullText {
 }
 
 // 内部常量
-
 const ESCAPE_CHARS: Record<string, string> = {
   '&': '&amp;',
   '<': '&lt;',
@@ -39,7 +38,7 @@ const ESCAPE_CHARS: Record<string, string> = {
   '"': '&quot;',
 };
 
-//工具函数
+// 工具函数
 
 /** 转义 HTML 特殊字符 */
 export const escapeHTML = (str: string): string =>
