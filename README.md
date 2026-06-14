@@ -78,6 +78,7 @@ Type commands into the input box, then results appear below.
 | `get -sa term …` | Strict match, AND logic |
 | `get -c term …` | Contains match, OR logic |
 | `get -ca term …` | Contains match, AND logic |
+| `add <key> <value>` | Add a new entry to the end |
 | `edit` | Open a textarea with the full data for manual editing |
 | `import` | Replace (`-a` to append) data from an editor or a file (`-f`) |
 | `export` | Download as `kv_data.txt` or copy to clipboard |

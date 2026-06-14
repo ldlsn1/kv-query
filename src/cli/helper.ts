@@ -35,6 +35,14 @@ examples:
     desc: ``,
   },
 
+  add: {
+    summary: 'add a new entry to the end',
+    usage: 'add <key> <value>',
+    desc: `examples:
+  add "simple" "value"
+  add "tag1 | tag2" new content`,
+  },
+
   edit: {
     summary: 'edit entries in a textarea',
     usage: 'edit',
@@ -88,7 +96,6 @@ examples:
   import -f -a  // append from file`,
   },
   
-
   export: {
     summary: 'export data as text',
     usage: 'export [-f | -c]',

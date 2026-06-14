@@ -90,16 +90,16 @@ export function save(): void {
 
 // 数据访问器
 
-/** 返回当前的原始文本（用于编辑/导出） */
-export function getRawText(): string {
+/** 返回当前的原始条目文本（用于编辑/导出） */
+export function getRawEntries(): string {
   return rawEntryText;
 }
 
 /**
- * 设置新的原始文本（编辑或导入后调用）
+ * 设置新的原始条目文本（编辑或导入后调用）
  * 立即触发 entries 和索引的重建，并持久化
  */
-export function setRawText(text: string): void {
+export function setRawEntries(text: string): void {
   rawEntryText = text;
   rebuildEntries();  // 解析 + 索引立即重建
   save();

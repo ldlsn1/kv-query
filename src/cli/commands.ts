@@ -8,8 +8,8 @@ import {
 import {
   getEntries,
   getFreqMap,
-  getRawText,
-  setRawText,
+  getRawEntries,
+  setRawEntries,
   mergeFreq,
 } from '../core/data.ts';
 import { search } from '../core/query.ts';
@@ -53,12 +53,24 @@ function cmdGet(app: App, args: string[]) {
   }
 }
 
-/**
- * 编辑命令：弹出编辑器，让用户修改标签区和频率
- */
+/** 添加条目 */
+function cmdAdd(app: App, args: string[]) {
+  if (args.length < 2) {
+    throw new Error(usageOf('add'));
+  }
+  const key = args[0];
+  // value 为 args[0] 之后所有参数用单个空格拼接
+  const value = args.slice(1).join(' ');
+  const line = `"${escapeKVKey(key)}" ${value}`;
+  const current = getRawEntries();
+  setRawEntries(current ? current + '\n' + line : line);
+  app.log(`added 1 entry`);
+}
+
+/** 编辑命令：弹出编辑器，让用户修改标签区和频率 */
 function cmdEdit(app: App) {
   // 构建编辑区初始内容：标签区 + --- + 频率行（只显示频率 >0）
-  const raw = getRawText();
+  const raw = getRawEntries();
   const freqMap = getFreqMap();
   const entries = getEntries();
 
@@ -75,7 +87,7 @@ function cmdEdit(app: App) {
   app.showEditor(fullText, (newText: string) => {
     const { entryText, freqs, invalidLines } = parseFullText(newText);
 
-    setRawText(entryText);
+    setRawEntries(entryText);
     mergeFreq(freqs);
 
     let msg = `saved ${getEntries().length} entries`;
@@ -111,10 +123,10 @@ async function cmdImport(app: App, args: string[]) {
 
   // 合并/替换标签区
   if (mode === 'append') {
-    const current = getRawText();
-    setRawText(current ? current + '\n' + entryText : entryText);
+    const current = getRawEntries();
+    setRawEntries(current ? current + '\n' + entryText : entryText);
   } else {
-    setRawText(entryText);
+    setRawEntries(entryText);
   }
 
   // 合并频率（新增或覆盖）
@@ -141,7 +153,7 @@ function cmdExport(app: App, args: string[]) {
     .map(([k, count]) => `"${escapeKVKey(k)}" ${count}`);
   
   // 拼接：原始文本 + --- + 频率行
-  const fullText = getRawText() + '\n---\n' + freqLines.join('\n');
+  const fullText = getRawEntries() + '\n---\n' + freqLines.join('\n');
 
   if (!args.length || args[0] === '-f') {
     downloadText(fullText, 'kv_data.txt');
@@ -190,6 +202,9 @@ export async function runCommand(app: App, line: string) {
         break;
       case 'ls':
         cmdGet(app, ['-a']);
+        break;
+      case 'add':
+        cmdAdd(app, args);
         break;
       case 'edit':
         cmdEdit(app);
