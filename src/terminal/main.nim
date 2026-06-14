@@ -20,7 +20,7 @@ proc printResults(results: seq[KVEntry]) =
     echo &"  {colorBlue}{r.compositeKey}{colorReset} {colorDim}:{colorReset} {r.value}"
 
 proc printHelp() =
-  echo &"Usage: kv_query {colorBlue}<COMMAND>{colorReset} [term ...]"
+  echo &"Usage: kv_query {colorBlue}<command>{colorReset} [terms]"
   echo ""
   echo "Commands:"
   echo &"  {colorBlue}ls{colorReset}   List all"

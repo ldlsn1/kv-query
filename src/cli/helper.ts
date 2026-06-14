@@ -1,7 +1,7 @@
 export const HELP: Record<string, any> = {
   get: {
     summary: 'get entries by searching tags',
-    usage: 'get <option> [term ...]',
+    usage: 'get <option> [terms]',
     desc: `alias: g
 
 options:
@@ -24,7 +24,7 @@ examples:
 
   g: {
     summary: 'alias for get',
-    usage: 'g <option> [term ...]',
+    usage: 'g <option> [terms]',
     desc: `notes:
   \`help get\` for full details.`,
   },
